@@ -16,6 +16,7 @@ router.get('/', (req, res) => {
   });
 });
 
+// GET posts
 router.get('/:id', (req, res) => {
   // do your magic!
 });
