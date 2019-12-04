@@ -1,12 +1,12 @@
 const express = require('express');
 const server = express();
-server.use(express.json());
+server.use(logger, express.json());
 
 // ROUTERS
 const PostsRouter = require('./posts/postRouter');
 const UsersRouter = require('./users/userRouter');
 
-server.get('/', (req, res) => {
+server.get('/', logger, (req, res) => {
   res.send(`<h2>Let's write some middleware!</h2>`);
 });
 
@@ -17,7 +17,10 @@ server.use('/users', UsersRouter);
 
 //custom middleware
 
-function logger(req, res, next) {}
+function logger(req, res, next) {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl}`);
+  next();
+}
 
 function validateUserId(req, res, next) {}
 
