@@ -14,8 +14,13 @@ server.get('/', (req, res) => {
 server.use('/posts', PostsRouter);
 server.use('/users', UsersRouter);
 
+
 //custom middleware
 
-// function logger(req, res, next) {}
+function logger(req, res, next) {}
+
+function validateUserId(req, res, next) {}
+
+function validateUser(req, res, next) {}
 
 module.exports = server;
