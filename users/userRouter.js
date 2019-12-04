@@ -4,14 +4,7 @@ const Users = require('../users/userDb')
 const router = express.Router();
 router.use(express.json());
 
-router.post('/', (req, res) => {
-  // do your magic!
-});
-
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
-});
-
+// READ users
 router.get('/', (req, res) => {
   Users.get(req)
   .then(users => {
@@ -23,7 +16,45 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/:id', (req, res) => {
+// CREATE users
+router.post('/', (req, res) => {
+  Users.insert(req.body)
+  .then(user => {
+    res.status(200).json(user);
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(500).json({ error: "The posts information could not be retrieved." });
+  });
+});
+
+// DELETE users
+router.delete('/:id', (req, res) => {
+  Users.remove(req.params.id)
+  .then(users => {
+    res.status(200).json(users);
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(500).json({ error: "The posts information could not be retrieved." });
+  });
+});
+
+// UPDATE users
+router.put('/:id', (req, res) => {
+  Users.update(req.params.id, req.body)
+  .then(users => {
+    res.status(200).json(users);
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(500).json({ error: "The posts information could not be retrieved." });
+  });
+
+});
+
+
+router.post('/:id/posts', (req, res) => {
   // do your magic!
 });
 
@@ -31,13 +62,8 @@ router.get('/:id/posts', (req, res) => {
   // do your magic!
 });
 
-router.delete('/:id', (req, res) => {
-  // do your magic!
-});
 
-router.put('/:id', (req, res) => {
-  // do your magic!
-});
+
 
 //custom middleware
 
