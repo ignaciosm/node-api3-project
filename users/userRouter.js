@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
 });
 
 // CREATE users
-router.post('/', (req, res) => {
+router.post('/', validateUser, (req, res) => {
   Users.insert(req.body)
   .then(user => {
     res.status(200).json(user);
@@ -30,7 +30,7 @@ router.post('/', (req, res) => {
 });
 
 // UPDATE users
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, (req, res) => {
   Users.update(req.params.id, req.body)
   .then(users => {
     res.status(200).json(users);
@@ -43,7 +43,7 @@ router.put('/:id', (req, res) => {
 });
 
 // DELETE users
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
   Users.remove(req.params.id)
   .then(users => {
     res.status(200).json(users);
@@ -55,7 +55,7 @@ router.delete('/:id', (req, res) => {
 });
 
 // GET /:id/posts
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId, (req, res) => {
   Users.getUserPosts(req.params.id)
   .then(posts => {
     res.status(200).json(posts);
@@ -66,52 +66,63 @@ router.get('/:id/posts', (req, res) => {
   });  
 });
 
-// CREATE POST /:id/posts
-// router.post('/:id/posts', (req, res) => {
-//   const newPost = req.body;
-
-//   Users.getById(req.params.id, newPost)
-//   .then(post => {
-//     Posts.insert(newPost)
-//     res.status(200).json(post);
-//   })
-//   .catch(error => {
-//     console.log(error);
-//     res.status(500).json({ error: "The posts information could not be retrieved." });
-//   });  
-// });
-
-// POST posts/:id/posts
-router.post('/:id/posts', (req, res) => {
+// CREATE posts/:id/posts
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   const id = req.params.id;
   const newPost = req.body;
 
-    Users.getById(id)
-      .then(post => {
-        Posts.insert(newPost)
-              .then(post => {
-                  res.status(201).json(post);
-              })
-      })
-      .catch(error => {
-          console.log(error);
-          res.status(500).json({ error: "There was an error while saving the comment to the database." });
-      });
+  Users.getById(id)
+    .then(post => {
+      Posts.insert(newPost)
+        .then(post => {
+          res.status(201).json(post);
+        })
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({ error: "There was an error while saving the comment to the database." });
+    });
 });
 
 
 //custom middleware
 
 function validateUserId(req, res, next) {
-  // do your magic!
+  const id = req.params.id;
+  Users.getById(id)
+  .then(user => {
+    if (user) {
+      req.user = user;
+      next();
+    } else {
+      res.status(400).json({ message: "invalid user id" });
+    }
+  });
 }
 
 function validateUser(req, res, next) {
-  // do your magic!
+  console.log('validateUser')
+  const validUser = req.body;
+
+  if (!validUser) {
+    res.status(400).json({ message: "missing user data" });
+  } else if (!validUser.name) {
+    res.status(400).json({ message: "missing required name field" });
+  } else {
+    next();
+  }
 }
 
 function validatePost(req, res, next) {
-  // do your magic!
+  const validPost = req.body;
+
+  if (!validPost) {
+    res.status(400).json({ message: "missing post data" });
+  } else if (!validPost.text) {
+    res.status(400).json({ message: "missing required text field" });
+  } else {
+    next();
+  }
 }
 
 module.exports = router;
